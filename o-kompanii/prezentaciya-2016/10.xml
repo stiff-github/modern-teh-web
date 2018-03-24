@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- for xml compliance -->
+<krpano version="1.0.8.14">
+    <!-- actions to perform while loading -->
+    <events onxmlcomplete="onxmlcompleteaction();"/>
+    <action name="onxmlcompleteaction">
+		plugin[combobox].selectiditem(combobox0);
+	</action>
+    <action name="playpanosounds">
+		playbackgroundsound(none);
+	</action>
+    <action name="stoppanosounds">
+		stopbackgroundsound();
+	</action>
+    <action name="closepanoobjects">
+	</action>
+    <!--************** Панорама *******************************************************************-->
+    <!-- @File="10.xml" @PanoName="vivakitchen" @FilePath="/Volumes/Rombik/!!!!выставка/Viva/1-10_1_2 Panorama_sphere.jpeg" -->
+    <panoview h="6.12" v="1.98" fov="90"/>
+    <!-- view parameters -->
+    <view fisheye="0" limitview="range" hlookatmin="-117.36" hlookatmax="117.36" vlookatmin="-68.4" vlookatmax="61.92" maxpixelzoom="1.0" fovmax="90" fov="90" hlookat="6.12" vlookat="1.98"/>
+    <autorotate horizon="1.98" tofov="90" waittime="1" speed="5"/>
+    <!-- preview image -->
+    <preview url="1data/10/preview.jpg" type="CUBESTRIP" striporder="FRBLUD" details="16"/>
+    <!-- the pano itself -->
+    <image type="CUBE" multires="true" tilesize="398" baseindex="0">
+        <level tiledimagewidth="3184" tiledimageheight="3184">
+            <left url="1data/10/3/3/%v_%u.jpg"/>
+            <front url="1data/10/0/3/%v_%u.jpg"/>
+            <right url="1data/10/1/3/%v_%u.jpg"/>
+            <back url="1data/10/2/3/%v_%u.jpg"/>
+            <up url="1data/10/4/3/%v_%u.jpg"/>
+            <down url="1data/10/5/3/%v_%u.jpg"/>
+        </level>
+        <level tiledimagewidth="1592" tiledimageheight="1592">
+            <left url="1data/10/3/2/%v_%u.jpg"/>
+            <front url="1data/10/0/2/%v_%u.jpg"/>
+            <right url="1data/10/1/2/%v_%u.jpg"/>
+            <back url="1data/10/2/2/%v_%u.jpg"/>
+            <up url="1data/10/4/2/%v_%u.jpg"/>
+            <down url="1data/10/5/2/%v_%u.jpg"/>
+        </level>
+        <level tiledimagewidth="796" tiledimageheight="796">
+            <left url="1data/10/3/1/%v_%u.jpg"/>
+            <front url="1data/10/0/1/%v_%u.jpg"/>
+            <right url="1data/10/1/1/%v_%u.jpg"/>
+            <back url="1data/10/2/1/%v_%u.jpg"/>
+            <up url="1data/10/4/1/%v_%u.jpg"/>
+            <down url="1data/10/5/1/%v_%u.jpg"/>
+        </level>
+        <level tiledimagewidth="398" tiledimageheight="398">
+            <left url="1data/10/3/0/%v_%u.jpg"/>
+            <front url="1data/10/0/0/%v_%u.jpg"/>
+            <right url="1data/10/1/0/%v_%u.jpg"/>
+            <back url="1data/10/2/0/%v_%u.jpg"/>
+            <up url="1data/10/4/0/%v_%u.jpg"/>
+            <down url="1data/10/5/0/%v_%u.jpg"/>
+        </level>
+        <!-- mobile phone / iphone images -->
+        <mobile>
+            <left url="1data/10/3/mobile_face.jpg"/>
+            <front url="1data/10/0/mobile_face.jpg"/>
+            <right url="1data/10/1/mobile_face.jpg"/>
+            <back url="1data/10/2/mobile_face.jpg"/>
+            <up url="1data/10/4/mobile_face.jpg"/>
+            <down url="1data/10/5/mobile_face.jpg"/>
+        </mobile>
+        <!-- tablet pc / ipad images -->
+        <tablet>
+            <left url="1data/10/3/tablet_face.jpg"/>
+            <front url="1data/10/0/tablet_face.jpg"/>
+            <right url="1data/10/1/tablet_face.jpg"/>
+            <back url="1data/10/2/tablet_face.jpg"/>
+            <up url="1data/10/4/tablet_face.jpg"/>
+            <down url="1data/10/5/tablet_face.jpg"/>
+        </tablet>
+    </image>
+    <!--************** Hotspots and lensflares ****************************************************-->
+    <hotspot name="spot0" onclick="mainloadpano(11.xml);" url="1data/graphics/spots/spot0.png" ath="54.2342" atv="12.8056"/>
+    <action name="hidepanospotsaction">
+		set(hotspot[spot0].visible, false);
+	</action>
+    <action name="showpanospotsaction">
+		set(hotspot[spot0].visible, true);
+	</action>
+    <!-- close all hotspots -->
+</krpano>

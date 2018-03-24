@@ -1,0 +1,1167 @@
+﻿<krpano>
+	
+	<events name="modul_events" keep="true"
+			onxmlcomplete="if(first_start===null, start_modul());"/>
+			
+	<style name="s_sound" url="%BASEDIR%/modul/plugins/soundinterface.swf" alturl="%BASEDIR%/modul/plugins/soundinterface.js" preload="true" volume="1.0" mute="false" /> 
+
+	<action name="start_modul">
+		set(plugin[map].onloaded, hidemapspot(););
+		set(plugin[map].visible, false);
+		
+		if(plugin[soundinterface].keep,
+			plugin[soundinterface].loadstyle(s_sound);
+			set(plugin[bn_music].visible, true);
+		);
+		
+		ifnot(stopSequence === undefined,interruptAnimation(););
+		set(plugin[combobox].visible, false);
+		delayedcall(0, 
+			if(plugin[thumbArray].keep,
+				set(plugin[thumbArray].visible, false);
+				set(plugin[thumbArray].alpha, 0);
+				set(plugin[thumbArray].enabled, false);
+				set(plugin[slide].visible, false);
+				set(plugin[slide].enabled, false);
+				set(plugin[slide].alpha, 0);
+				set(plugin[strap].visible, false);
+				set(plugin[strap].enabled, false);
+				set(plugin[strap].alpha, 0);
+				set(plugin[strapArrow].visible, false);
+				set(plugin[strapArrow].enabled, false);
+				set(plugin[strapArrow].alpha, 0);
+				set(plugin[thumbMovePrev].visible, false);
+				set(plugin[thumbMovePrev].enabled, false);
+				set(plugin[thumbMovePrev].alpha, 0);
+				set(plugin[thumbMoveNext].visible, false);
+				set(plugin[thumbMoveNext].enabled, false);
+				set(plugin[thumbMoveNext].alpha, 0);
+				set(plugin[thumbMovePrevArrow].visible, false);
+				set(plugin[thumbMovePrevArrow].enabled, false);
+				set(plugin[thumbMovePrevArrow].alpha, 0);
+				set(plugin[thumbMoveNextArrow].visible, false);
+				set(plugin[thumbMoveNextArrow].enabled, false);
+				set(plugin[thumbMoveNextArrow].alpha, 0);
+			);
+		);
+		
+		if(plugin[thumbArray].keep, 
+			indexoftxt(rr, get(plugin[combobox].item[0].onClick), ".xml"); 
+			sub(rr, 14);
+			subtxt(name_tour, get(plugin[combobox].item[0].onClick), 13, get(rr)); <!-- Вычисляем название тура-->
+			,
+			set(name_tour, "1");
+		);
+		
+		set(tek_scene, "");
+		if(plugin[firstpano].xml===null, 
+			txtadd(tek_scene, get(name_tour), 0, ".xml");
+			,
+			txtadd(tek_scene, get(plugin[firstpano].xml));
+		);
+		
+		scan_combobox();
+		set(point_act, -1);
+		if(plugin[map].keep, recalc_map(); select_mapspot(););
+				
+		start_buttons();
+		
+		
+		
+		set(first_start, false);
+		
+ 		load_new_pano(get(tek_scene)); 
+		
+
+		
+		start_help();
+		set(autorotate.enabled, true); 
+	</action>
+		
+	
+	<action name="load_new_pano">
+		if(plugin[map].keep,
+			if(point_act!=-1, 
+				plugin[get(point_act)].loadstyle(s_mapspot_dis);
+				set(plugin[get(point_act)].point_type, -1);
+			);
+		);
+		closepanoobjects();
+		ifnot(stopSequence === undefined,interruptAnimation(););
+		set(plugin[combobox].visible, false);
+		loadpano(%1,NULL,NULL, BLEND(1));
+		if(plugin[thumbArray].keep, set(plugin[thumbArray].visible, false););
+		
+		set(tek_scene, %1);
+		
+		set(n_spot, 0);
+		scan_name_pano(get(action[onxmlcompleteaction].content));
+		scan_spots();
+		
+		if(plugin[map].keep, select_mapspot(););
+	</action>	
+	
+	<plugin name="mymap" keep="true"  handcursor="false" onclick="closemymap()" zorder="1"/>
+		<plugin name="map_black" keep="true" url="%BASEDIR%/modul/images/back_black.png" zorder="10" handcursor="true" align="center" alpha="0" visible="false" onclick="openmymap()" parent="mymap"/>
+		<plugin name="map_title" keep="true" url="%BASEDIR%/modul/images/map_title.png" zorder="15" handcursor="true" align="center" alpha="0" visible="false" onclick="openmymap()" parent="mymap"/>
+	<style name="s_mapspot" keep="true" visible="true" parent="mymap" edge="center" align="lefttop" scale="0.65" zorder="10" />
+	<style name="s_mapspot_act" url="%BASEDIR%/modul/images/rhsa.png" keep="true" parent="mymap" edge="center" align="lefttop" scale="0.8" zorder="10" />
+	<style name="s_mapspot_dis" url="%BASEDIR%/modul/images/rhs-dis.png" keep="true"  parent="mymap" edge="center" align="lefttop" scale="0.65" zorder="10" />
+	<plugin name="maptext_over" keep="true" url="%SWFPATH%/modul/plugins/textfield.swf" visible="false" zorder="15"  autoheight="true" selectable="false" y="-15" x="0" edge="bottom" height="60" width="200" align="center" textglow="0"  backgroundalpha="0.8"  backgroundcolor="0x242e32"  background="true" alpha="0" enabled="false" html="" 
+		css="p{color:#FFFFFF; font-family: arial; alpha:1; font-size:11; margin-left:0; font-weight: bold; margin-left:3; text-align:center; }" />
+
+	<action name="closemymap">
+		set(plugin[mymap].width0, get(plugin[mymap].width));
+		tween(width, 12%, 0.5, default, 
+			copy(plugin[map_black].width, plugin[mymap].pixelwidth);
+			copy(plugin[map_black].height, plugin[mymap].pixelheight);
+			set(plugin[map_black].visible, true);
+			set(plugin[map_title].visible, true);
+			tween(plugin[map_black].alpha, 0.6, 0.5);
+			tween(plugin[map_title].alpha, 1, 0.5);
+		);
+		for(set(i,0), i LE count_mapspot, inc(i),
+			txtadd(mpoint, "mappoint", get(i));
+			set(plugin[get(mpoint)].visible, false);
+		);
+	</action>
+	
+	<action name="openmymap">
+		tween(plugin[map_black].alpha, 0, 0.5);
+		tween(plugin[map_title].alpha, 0, 0.5, default, 
+			set(plugin[map_black].visible, true);
+			set(plugin[map_title].visible, true);
+			tween(plugin[mymap].width, get(plugin[mymap].width0), 0.5, defalut, 
+				for(set(i,0), i LE count_mapspot, inc(i),
+					txtadd(mpoint, "mappoint", get(i));
+					set(plugin[get(mpoint)].visible, true);
+				);
+			);
+		);
+		
+	</action>
+		
+	<action name="select_mapspot">
+		set(point_act, -1);
+		for(set(i,0), i LE count_mapspot, inc(i),
+			txtadd(mpoint, "mappoint", get(i));
+			if(plugin[get(mpoint)].toscene==tek_scene, 
+				set(point_act, get(mpoint));
+			);
+		);
+		if(point_act!=-1, 
+			plugin[get(point_act)].loadstyle(s_mapspot_act);
+			set(plugin[get(point_act)].point_type, 1); <!-- 0 - обычная, 1- активная, -1 - мы там были -->
+		);
+	</action>
+	
+	<action name="mapspot_click">
+		load_new_pano(get(toscene));
+	</action>
+	
+	<action name="mapspot_over">
+		if(point_type!=1, set(scale, 0.8););
+		for(set(i,0), i LT baza_combobox.count, inc(i),
+			if(baza_combobox[get(i)].url==toscene, 
+				set(ot, get(baza_combobox[get(i)].caption)); 
+				set(i, get(baza_combobox.count));
+			);
+		);
+
+		txtadd(ttext, <p  align="center">, get(ot) ,</p>);
+		set(plugin[maptext_over].html, get(ttext));
+		set(plugin[maptext_over].parent, get(name));
+		
+		set(plugin[maptext_over].visible, true);
+		tween(plugin[maptext_over].alpha, 1, 0.5);
+	</action>
+	
+	<action name="mapspot_out">
+		if(point_type!=1, set(scale, 0.65););
+		tween(plugin[maptext_over].alpha, 0, 0.5, default,
+			set(plugin[maptext_over].visible, false);
+		);
+	</action>
+		
+	<action name="recalc_map">
+		set(plugin[mymap].align, get(plugin[map].align));
+		set(plugin[mymap].x, get(plugin[map].x));
+		set(plugin[mymap].y, get(plugin[map].y));
+		set(plugin[mymap].y, get(plugin[map].y));
+		set(plugin[mymap].width, get(plugin[map].width));
+		set(plugin[mymap].height, get(plugin[map].height));
+		set(plugin[mymap].url, get(plugin[map].url));
+	
+		txtadd(name_mapspot, "mapspot0");
+		set(t1, 0);
+		loop(plugin[get(name_mapspot)].keep, 
+			set(mpoint, "");
+			txtadd(mpoint, "mappoint", get(t1));
+			addplugin(get(mpoint));
+			plugin[get(mpoint)].loadstyle(s_mapspot);
+			set(plugin[get(mpoint)].x, get(plugin[get(name_mapspot)].x));
+			set(plugin[get(mpoint)].y, get(plugin[get(name_mapspot)].y));
+			set(plugin[get(mpoint)].url, "%BASEDIR%/modul/images/rhs.png"); 
+			set(plugin[get(mpoint)].onclick, mapspot_click(););
+			set(plugin[get(mpoint)].onover, mapspot_over(););
+			set(plugin[get(mpoint)].onout, mapspot_out(););
+			set(plugin[get(mpoint)].point_type, 0);
+			
+			indexoftxt(hh, get(plugin[get(name_mapspot)].onclick), ".xml"); 
+			sub(hh, 9);
+			subtxt(plugin[get(mpoint)].toscene, get(plugin[get(name_mapspot)].onclick), 13, get(hh));
+			
+			inc(t1);
+			txtadd(name_mapspot, "mapspot", get(t1));
+		);
+		
+		dec(t1);
+		copy(count_mapspot, t1);
+	</action>
+	
+	
+	
+	
+	
+	<action name="scan_combobox">
+		for(set(h, 0), h LT plugin[combobox].item.count, inc(h), 
+			for(set(f, 16), f LT 80, inc(f),
+					subtxt(f_text, get(plugin[combobox].item[get(h)].onClick), get(f), 1);
+					if(f_text==")", sub(ll, f, 13); set(f, 80));
+			);
+			subtxt(ll_text, get(plugin[combobox].item[get(h)].onClick), 13, get(ll));
+			set(baza_combobox[get(h)].url, get(ll_text));
+			set(baza_combobox[get(h)].caption, get(plugin[combobox].item[get(h)].caption));
+			if(plugin[thumbArray].keep, 
+				txtadd(name_thumb, "thumb_", get(name_tour), get(h));
+				set(baza_combobox[get(h)].overimage, get(plugin[get(name_thumb)].url));
+			);
+		);
+	</action>
+	
+	
+	<action name="scan_name_pano">
+		indexoftxt(ss, %1, "(combobox");
+		inc(ss);
+		for(set(i, get(ss)), i LT 800, inc(i),
+				subtxt(qs, %1, get(i), 1);
+				if(qs==")", sub(ls, i, ss); set(i, 800));
+		);
+		subtxt(cc_text, %1, get(ss), get(ls));
+		set_name_pano(get(plugin[combobox].item[get(cc_text)].caption));
+	</action>
+	
+	<action name="scan_spots">
+		set(stopSequence, true);
+		for(set(p,0), p LT hotspot.count, inc(p),	
+			if(hotspot[%p].onclick!==null, 
+				set(hotspot[%p].onloaded, "");
+				subtxt(qt, hotspot[%p].onclick, 0, 8);
+				if(qt=="mainload", 
+					if(hotspot[%p].point[1].atv GT -181, 
+						this_hotspot(get(hotspot[%p].name), "polygon");
+						, 
+						this_hotspot(get(hotspot[%p].name), "spot");
+					);
+					set(tekspot, "hotspot");
+					, 
+					if(qt=="closeall", 
+						txtadd(qn, get(hotspot[%p].name), "object");
+						this_fotospot(get(hotspot[%p].name), get(plugin[%qn].url), get(hotspot[%p].onhover));
+						set(tekspot, "fotospot");
+					);
+					if(qt=="closeglo", 
+						txtadd(qn, get(hotspot[%p].name), "object");
+						this_fotospot(get(hotspot[%p].name), get(plugin[%qn].url), get(hotspot[%p].onhover));
+						set(tekspot, "fotospot");
+					);
+				);
+			,
+				if(hotspot[%p].handcursor==false, 
+					subtxt(qv, hotspot[%p].onhover, 9, 5);
+					if(qv=="video", set(tekspot, "videospot"); this_videospot(get(hotspot[%p].name), get(hotspot[%p].onhover));
+								, 
+								set(tekspot, "infospot"); 
+								this_infospot(get(hotspot[%p].name), get(hotspot[%p].onhover));
+					);
+					
+				);
+			);
+		);
+		add_hotspot();
+	</action>
+	
+	<action name="this_hotspot">
+		if(%2=="spot", 
+			for(set(u,13), u LT 100, inc(u),
+				subtxt(qh, get(hotspot[%1].onclick), get(u), 1);
+				if(qh==")", sub(lh, u, 13); set(u, 100));
+			);
+			subtxt(h_xml, get(hotspot[%1].onclick), 13, get(lh));
+			if(hotspot[%1].onhover!==null, 
+					subtxt(nap, get(hotspot[%1].onhover), 9, 1);
+					if(nap !== null,
+						if(nap==0, set_hotspot(%1, get(h_xml), "s_hs_up"),
+							if(nap==3, set_hotspot(%1, get(h_xml), "s_hs_right"),
+								if(nap==6, set_hotspot(%1, get(h_xml), "s_hs_down"),
+									if(nap==9, set_hotspot(%1, get(h_xml), "s_hs_left"),
+										if(nap=="a", set_hotspot(%1, get(h_xml), "s_hs_air"),
+											if(nap=="g", set_hotspot(%1, get(h_xml), "s_hs_ground");,
+												set_hotspot(%1, get(h_xml), "s_hs_up");
+											);
+										);
+									);
+								);
+							);
+						);
+						,
+						set_hotspot(%1, get(h_xml), "s_hs_up"); 
+					);
+				,	
+					set_hotspot(%1, get(h_xml), "s_hs_up");
+			);
+		);
+		if(%2=="polygon", 
+			for(set(u,13), u LT 800, inc(u),
+				subtxt(qh, get(hotspot[%1].onclick), get(u), 1);
+				if(qh==")", sub(lh, u, 13); set(u, 800));
+			);
+			subtxt(h_xml, get(hotspot[%1].onclick), 13, get(lh));
+			
+			for(set(u, 9), u LT 800, inc(u),
+				subtxt(qh, get(hotspot[%1].onhover), get(u), 1);
+				if(qh==")", sub(lh, u, 9); set(u, 800); );
+			);
+			subtxt(h_text, get(hotspot[%1].onhover), 9, get(lh));
+			set_hotspot(%1, get(h_xml), "polygon", get(h_text));
+		); 
+	</action>
+	
+	<action name="this_fotospot">
+			set(ww, %3);
+			indexoftxt(ih, %3, ");");  
+			sub(ih, 9);
+			subtxt(f_text, get(ww), 9, get(ih));
+			set_fotospot(%1,%2, get(f_text));
+	</action>
+	
+	<action name="this_videospot">
+		for(set(r,15), r LT 800, inc(r),
+			subtxt(qv, get(hotspot[%1].onhover), get(r), 1);
+			if(qv=="|", sub(lf, r, 15); add(tek_r1, r, 1); set(r, 800););
+		);
+		subtxt(v_url, get(hotspot[%1].onhover), 15, get(lf));
+		for(set(r, get(tek_r1)), r LT 800, inc(r),
+			subtxt(qv, get(hotspot[%1].onhover), get(r), 1);
+			if(qv==")", sub(lf, r, get(tek_r1)); add(tek_r2, get(r), 1); set(r, 800););
+		);
+		subtxt(v_jpg, get(hotspot[%1].onhover), get(tek_r1), get(lf)); 
+		for(set(r, get(tek_r2)), r LT 800, inc(r),
+			subtxt(qv, get(hotspot[%1].onhover), get(r), 1);
+			if(qv==")", sub(lf, r, get(tek_r2)); set(r, 800););
+		);
+		subtxt(v_text, get(hotspot[%1].onhover), get(tek_r2), get(lf)); 
+		
+		set_videospot(%1, get(v_url), get(v_jpg), get(v_text));
+	</action>
+	
+	<action name="this_infospot">
+		set(ww, %2);
+		indexoftxt(ih, %2, ");");  
+		sub(ih, 9);
+		subtxt(is_text, get(ww), 9, get(ih));
+		set_infospot(%1, get(is_text));
+	</action>
+	
+	
+	<plugin name="text_title" keep="true" url="%SWFPATH%/modul/plugins/textfield.swf"   autoheight="true" selectable="false" align="lefttop" x="5" y="5" textglow="0" width="200" backgroundalpha="0.7"  backgroundcolor="0x112332" textglowcolor="0xffffff" background="true" alpha="1" enabled="false"
+        html="" css="p{color:#FFFFFF; font-family: arial; alpha:1; font-size:11; margin-left:0; font-weight: bold; margin-left:3; text-align:center; }" />
+
+	<action name="set_name_pano">
+		txtadd(t_text,  <p  align="left">, %1,</p> );
+		set(plugin[text_title].html, get(t_text));
+		if(plugin[map].x GE 0, 
+			set(plugin[text_title].y, get(plugin[map].height));
+			set(plugin[text_title].oy, 10);
+			set(plugin[text_title].ox, 5);
+		);
+	</action>
+	
+	
+	<style name="s_hs_up"  keep="false" edge="top"  visible="false" scale="0.8"  alpha="1" crop="0|0|80|80"  onovercrop="0|80|80|80"  ondowncrop="0|80|80|80"  url="%BASEDIR%/modul/images/arrow-up-over.png" onover="hs_over()"  onout="hs_out()" onhover=""/>
+	<style name="s_hs_down" keep="false" edge="bottom"  visible="false" scale="0.8"  alpha="1" crop="0|0|80|80"  onovercrop="0|80|80|80" ondowncrop="0|80|80|80"  url="%BASEDIR%/modul/images/arrow-down-over.png" onover="hs_over()"   onout="hs_out()" onhover=""/>
+	<style name="s_hs_left" keep="false" edge="left"  visible="false" scale="0.8"  alpha="1" crop="0|0|80|80"  onovercrop="0|80|80|80" ondowncrop="0|80|80|80"  url="%BASEDIR%/modul/images/arrow-left-over.png" onover="hs_over()"   onout="hs_out()" onhover=""/>
+	<style name="s_hs_right" keep="false" edge="right"  visible="false" scale="0.8"  alpha="1" crop="0|0|80|80"  onovercrop="0|80|80|80" ondowncrop="0|80|80|80"  url="%BASEDIR%/modul/images/arrow-right-over.png" onover="hs_over()"   onout="hs_out()" onhover=""/>
+	<style name="s_hs_air" keep="false" edge="center"  visible="false" scale="0.8"  alpha="1" crop="0|0|80|80"  onovercrop="0|80|80|80" ondowncrop="0|80|80|80"  url="%BASEDIR%/modul/images/hs_air.png" onover="hs_over()"   onout="hs_out()" onhover=""/>
+	<style name="s_hs_ground" keep="false" edge="center"  visible="false" scale="0.8"  alpha="1" crop="0|0|80|80"  onovercrop="0|80|80|80" ondowncrop="0|80|80|80"  url="%BASEDIR%/modul/images/hs_ground.png" onover="hs_over()"   onout="hs_out()" onhover=""/>
+	
+	<plugin name="text_over" keep="true" url="%SWFPATH%/modul/plugins/textfield.swf" visible="false"   autoheight="true" selectable="false"  edge="bottom" height="60" width="200" align="lefttop" textglow="0"  backgroundalpha="0.8"  backgroundcolor="0x112332"  background="true" alpha="0" enabled="false" html="" 
+		css="p{color:#FFFFFF; font-family: arial; alpha:1; font-size:11; margin-left:0; font-weight: bold; margin-left:3; text-align:center; }" />
+	
+	<textstyle name="text_hover" font="arial" bold="false" fontsize="13" yoffset="-15" background="true" alpha="0.7" backgroundcolor="0x112332" textcolor="0xFFFFFF" border="false" />
+	
+	<style name="s_overimage" keep="false" edge="bottom" align="top" visible="false" scale="0.67"  alpha="0" crop="100|50|300|150" parent="text_over"/>
+	
+	<action name="hs_over">
+		for(set(k,0), k LT n_spot, inc(k),
+			txtadd(qq, "overimage", get(k));
+			set(plugin[get(qq)].alpha, 0);
+		);
+	
+		spheretoscreen(ath,atv, x1, y1);	
+		if(edge==top, sub(y1, 5), 
+				sub(y1, 26);
+		);
+		set(plugin[text_over].x, get(x1));
+		set(plugin[text_over].y, get(y1));
+		txtadd(t_text, <p  align="center">, get(onovertext) ,</p>);
+		set(plugin[text_over].html, get(t_text));
+		
+		tween(scale, 0.9, 0.1, default, 
+			set(plugin[text_over].visible, true);
+			set(plugin[get(onoverimage)].visible, true);
+			tween(plugin[text_over].alpha, 1, 0.1);
+			tween(plugin[get(onoverimage)].alpha, 1, 0.1);
+		)
+				
+		set(autorotate.enabled, false);
+			
+	</action>
+	
+	<action name="hs_polygon_hover">
+		showtext(get(onovertext), text_hover);
+	</action>
+	
+	<action name="hs_out">
+		tween(scale, 0.8, 0.1, default, 
+			tween(plugin[text_over].alpha, 0, 0.1);
+			tween(plugin[get(onoverimage)].alpha, 0, 0.1, default, 
+				set(plugin[text_over].visible, false);
+				set(plugin[get(onoverimage)].visible, false);
+				set(autorotate.enabled, get(const_autorotate));
+			);
+		);
+	</action>
+	
+	<action name="hs_click">
+		set(plugin[text_over].visible, false);
+		set(crop, get(onovercrop));
+		tween(alpha, 0, 0.5);
+		ifnot(ismobile, 	lookto(get(ath), get(atv), 10, tween(default,3), true, true,
+										if(radar_active, unvisible_radar()); load_new_pano(get(toscene));),
+						     lookto(get(ath), get(atv), 10, tween(default,3), true, true, 
+										if(radar_active, unvisible_radar()); load_new_pano(get(toscene)););
+			);  
+	</action>
+
+	<action name="set_hotspot">
+		
+		set(name_spot, "");
+		txtadd(name_spot, mspot, get(n_spot));
+		for(set(i,0), i LT baza_combobox.count, inc(i),
+			if(baza_combobox[get(i)].url==%2, 
+				set(over_text, get(baza_combobox[get(i)].caption)); 
+				set(over_image, get(baza_combobox[get(i)].overimage)); 
+				set(i, get(baza_combobox.count));
+			);
+	
+		);
+		if(%3!="polygon", 
+			set(allspot[get(n_spot)].name, get(name_spot));
+			set(allspot[get(n_spot)].ath, get(hotspot[%1].ath));
+			set(allspot[get(n_spot)].atv, get(hotspot[%1].atv));
+			set(allspot[get(n_spot)].toscene, %2);
+			set(allspot[get(n_spot)].spotstyle, %3);
+			set(allspot[get(n_spot)].onovertext, get(over_text));
+			set(hotspot[%1].visible, false);		
+			set(hotspot[%1].enabled, false);		
+			set(hotspot[%1].alpha, 0);
+			if(plugin[thumbArray].keep, <!-- если активны тамбнейлы-->
+				set(name_oi, "");
+				txtadd(name_oi, "overimage", get(n_spot));
+				addplugin(get(name_oi));
+				plugin[get(name_oi)].loadstyle(s_overimage);
+				set(plugin[get(name_oi)].url, get(over_image));
+				set(allspot[get(n_spot)].onoverimage, get(name_oi));
+			);
+
+			,
+			set(hotspot[%1].onhover, hs_polygon_hover());
+			set(hotspot[%1].onovertext, get(over_text));
+			set(hotspot[%1].onout, hs_out());
+			set(hotspot[%1].toscene, %2);
+			set(hotspot[%1].onclick, hs_click());
+			set(hotspot[%1].visible, true);
+			set(hotspot[%1].width, 80);
+			set(hotspot[%1].height, 80);
+		);
+		
+		inc(n_spot);
+	</action>
+	
+	<action name="add_hotspot">
+		
+		for(set(k,0), k LT n_spot, inc(k),
+			set(qq, get(allspot[get(k)].name));
+			addhotspot(get(qq));
+			hotspot[get(qq)].loadstyle(get(allspot[get(k)].spotstyle));
+			set(hotspot[get(qq)].ath, get(allspot[get(k)].ath));
+			set(hotspot[get(qq)].atv, get(allspot[get(k)].atv));
+			set(hotspot[get(qq)].toscene, get(allspot[get(k)].toscene));
+			set(hotspot[get(qq)].onovertext, get(allspot[get(k)].onovertext));
+			set(hotspot[get(qq)].onoverimage, get(allspot[get(k)].onoverimage));
+			set(hotspot[get(qq)].visible, true);
+			set(hotspot[get(qq)].onclick, hs_click());
+		);
+	</action>
+
+	
+	
+    <style name="style_textfield"  keep="true" url="%BASEDIR%/modul/plugins/textfield.swf" align="lefttop" textglow="0" width="300" textglowcolor="0x000000" x="0" y="0" 
+			autoheight="true" background="false" alpha="1"	 zorder="15"  visible="false"  enabled="false" selectable="false" edge="center" 
+			html=""	css="data:text_css" 
+			/>
+	<data name="text_css"> p{color:#FFFFFF; font-family:sans-serif; font-size:13; margin-left:1; margin-right:1; text-align:left; font-weight: normal;} </data>
+	<style name="s_infospot" keep="false" edge="bottom"  scale="0.8" alpha="1" url="%BASEDIR%/modul/images/hs_info.png"  width="80" height="80" crop="0|0|80|80"  onovercrop="0|80|80|80" ondowncrop="0|80|80|80" handcursor="true" onover="is_over(name)" onhover="" onclick="is_click(name)" onout="is_out(name)" />
+	<plugin name="back_info" align="lefttop"  edge="center" keep="true" alpha="0.8" url="%BASEDIR%/modul/images/back_black.png" visible="false" zorder="10" enabled="false" />	     
+	
+	<action name="is_close">
+		ifnot(tek_infospot===null,
+			set(events.onmousedown, "");
+			set(hotspot[get(tek_infospot)].visible, true);
+			set(plugin[get(tek_text)].visible, false);
+			set(plugin[back_info].visible, false);
+			ifnot(%1==0, 
+					set(info_close, true);
+					set(autorotate.enabled, get(tek_rotate));
+			);
+		);
+	</action>
+	
+	<action name="open_is_win">
+		set(hotspot[get(tek_infospot)].visible, false);
+			
+		set(plugin[back_info].width, 32);
+		set(plugin[back_info].height, 32);
+		
+		spheretoscreen(hotspot[get(tek_infospot)].ath, hotspot[get(tek_infospot)].atv, tx, ty);
+				
+		set(plugin[back_info].x, get(tx));
+		if(isdesktop, dec(ty, 22), dec(ty, 40));
+		set(plugin[back_info].y, get(ty));
+		set(plugin[back_info].visible, true);
+		
+		set(plugin[get(textfield)].y, get(ty));
+		set(plugin[get(textfield)].x, get(tx));
+				
+		tween(plugin[back_info].height, get(plugin[get(textfield)].height), 0.1);
+		tween(plugin[back_info].width, 300, 0.1, default, set(plugin[get(tek_text)].visible, true));
+
+	</action>
+	
+	<action name="is_click">
+		ifnot(tek_foto===null, close_fs_win(););
+		set(autorotate.enabled, false);
+		ifnot(info_close, is_close(0));
+		set(info_close, false);
+		set(events.onmousedown, is_close());
+		if(ishtml5, set(tek_gyro, get(plugin[gyro].enabled));
+					set(plugin[gyro].enabled, false);
+		);
+		set(tek_infospot, get(%1));
+		set(tek_text, get(hotspot[get(%1)].textfield));
+		spheretoscreen(hotspot[get(%1)].ath, hotspot[get(%1)].atv, tx, ty);
+		sub(korr_cam_y, ty, plugin[get(tek_textfield)].height);
+		open_is_win(%1)
+	</action>
+	
+	<action name="is_over">
+		tween(scale, 0.9, 0.1);
+		set(autorotate.enabled, false);
+	</action>
+	
+	<action name="is_out">
+		tween(scale, 0.8, 0.1);
+		if(info_close, 
+			if(fotospot_close,
+				set(autorotate.enabled, get(tek_rotate)););
+		);
+	</action>
+			
+	<action name="set_infospot">
+		set(info_close,true);
+		hotspot[%1].loadstyle(s_infospot);
+		set(hotspot[%1].text, %2);
+		if(ismobile, set(hotspot[%1].scale, 0.8););
+		
+		txtadd(ti2, "infotext_", %1);
+		set(hotspot[%1].textfield, get(ti2));
+		addplugin(get(ti2));
+		plugin[get(ti2)].loadstyle(style_textfield);
+		
+		set(t_text2, "");
+		txtadd(t_text2, <p  align="left">, %2, </p>);
+		
+		set(plugin[get(ti2)].css, "data:text_css"); 
+		set(plugin[get(ti2)].html, get(t_text2));
+		
+		set(plugin[get(ti2)].x, 0);
+		set(plugin[get(ti2)].y, 0);
+		
+	</action>
+	
+	
+    <style name="style_fototext"  keep="true" url="%BASEDIR%/modul/plugins/textfield.swf" align="center" textglow="3" width="480" textglowcolor="0x000000" x="0" y="0" 
+			autoheight="true" background="false" alpha="1"	 zorder="9"  visible="false"  enabled="false" selectable="false" edge="bottom" 
+			html=""	css="data:text_css" 
+			/>
+	<data name="text_css"> p{color:#FFFFFF; font-family:sans-serif; font-size:13; margin-left:1; margin-right:1; text-align:left; font-weight: normal;} </data>
+		
+	<style name="s_fotospot" keep="false" edge="bottom"  scale="0.8" alpha="1" url="%BASEDIR%/modul/images/hs_foto.png" crop="0|0|80|80"  onovercrop="0|80|80|80" ondowncrop="0|80|80|80"  frame="0" lastframe="0" onhover="" />
+	<style name="s_foto" keep="false" visible="false" edge="top" align="center" scale="1" alpha="1" zorder="16"/>
+
+	<plugin name="back_foto" align="center"  edge="center" keep="true" alpha="0.8" url="%BASEDIR%/modul/images/back_black.png" visible="false" zorder="15" enabled="true" />	     
+	
+	<plugin name="fototext_over" keep="true" url="%SWFPATH%/modul/plugins/textfield.swf"  autoheight="true" selectable="false"  edge="bottom" height="60" width="200" align="lefttop" textglow="0"  visible="false" backgroundalpha="0.8"  backgroundcolor="0x242e32"  background="true" alpha="0" enabled="false" html="" 
+		css="p{color:#FFFFFF; font-family: arial; alpha:1; font-size:11; margin-left:0; font-weight: bold; margin-left:3; text-align:center; }" zorder="20"/>
+	
+	<textstyle name="text_hover" font="arial" bold="false" fontsize="13" yoffset="-15" background="true" alpha="0.7" backgroundcolor="0x242e32" textcolor="0xFFFFFF" border="false" />
+	
+	<action name="close_fs_win">
+		set(plugin[get(tek_foto)].visible, false);
+		set(plugin[get(tek_fototext)].visible, false);
+		set(plugin[back_foto].visible, false);		
+		set(plugin[back_foto].height, 20);		
+		set(plugin[back_foto].width, 20);
+		set(events.onmousedown, "");	
+		set(fotospot_close, true);		
+		set(autorotate.enabled, get(tek_rotate));
+	</action>
+	
+	<action name="open_fs_win">
+		set(plugin[back_foto].visible, true);
+		
+		ifnot(tek_foto===null,
+			set(plugin[get(tek_fototext)].visible, false);
+			set(plugin[get(tek_foto)].visible, false);
+		);
+		
+		set(tek_foto, get(hotspot[%1].foto));		
+		set(width_win, 480);
+		set(height_win, 480);
+		set(width_win_with_border, 500);
+		set(win_border, 10);
+		
+		if(plugin[get(tek_foto)].imagewidth GT plugin[get(tek_foto)].imageheight, 
+					div(image_scale, width_win, plugin[get(tek_foto)].imagewidth),
+					div(image_scale, height_win, plugin[get(tek_foto)].imageheight));
+		set(plugin[get(tek_foto)].scale, get(image_scale));
+		
+		set(tek_fototext, get(hotspot[%1].fototext));		
+		
+		set(plugin[back_foto].onclick, close_fs_win());
+		set(plugin[get(tek_fototext)].onclick, close_fs_win());
+		set(plugin[get(tek_foto)].onclick, close_fs_win());
+		set(events.onmousedown, "close_fs_win()");
+		
+		mul(back_height, plugin[get(tek_foto)].imageheight, image_scale);
+		ifnot(plugin[get(tek_fototext)].nulltext, add(back_height, plugin[get(tek_fototext)].height););
+		add(back_height, win_border);
+		add(back_height, win_border);
+		
+		mul(tt5, back_height, 0.5);
+		copy(ee, tt5);
+		dec(tt5, get(ee));
+		dec(tt5, get(ee));
+		
+		add(tt5, win_border);
+		
+		set(plugin[get(tek_foto)].y, get(tt5));
+	
+		set(plugin[get(tek_fototext)].parent, get(tek_foto));
+		set(plugin[get(tek_fototext)].align, bottom);
+		set(plugin[get(tek_fototext)].edge, top);
+		set(plugin[get(tek_fototext)].y, -3);
+		
+		tween(plugin[back_foto].width, get(width_win_with_border), 0.1, default, 
+			tween(plugin[back_foto].height, get(back_height), 0.1, default, 
+						set(plugin[get(tek_foto)].visible, true);
+						set(plugin[get(tek_fototext)].visible, true);
+			);
+		);
+		
+	</action>
+	
+	<action name="fs_click">
+		set(fotospot_close, false);
+		set(autorotate.enabled, false);
+		ifnot(info_close, is_close(0));
+		
+		if(plugin[name].loading, wait(0.1); fs_click(); , open_fs_win(get(name)));
+	</action>
+	
+	<action name="fs_over">
+		spheretoscreen(ath,atv, x1, y1);
+		sub(y1, 65);
+		set(plugin[fototext_over].x, get(x1));
+		set(plugin[fototext_over].y, get(y1));
+		txtadd(t_text, <p  align="center">, get(text) ,</p>);
+		set(plugin[fototext_over].html, get(t_text));
+		
+		tween(scale, 0.9, 0.1, default,
+				set(plugin[fototext_over].visible, true);
+				tween(plugin[fototext_over].alpha, 1, 0.5);
+			);
+		set(autorotate.enabled, false);
+	</action>
+	
+	
+	
+	<action name="fs_out">
+		tween(scale, 0.8, 0.1, default, 
+				set(plugin[fototext_over].visible, false);
+				tween(plugin[fototext_over].alpha, 0, 0.5);
+		);
+		if(fotospot_close, 
+				if(info_close, 
+					set(autorotate.enabled, get(tek_rotate)););
+		);
+	</action>
+				
+	<action name="set_fotospot">
+		set(fotospot_close, true);
+		hotspot[%1].loadstyle(s_fotospot);
+		set(hotspot[%1].text, %3);
+
+		set(hotspot[%1].onclick, "fs_click(name)");
+		set(hotspot[%1].onover, "fs_over(name)");
+		set(hotspot[%1].onout, "fs_out(name)");
+		set(hotspot[%1].hovertext, %3);
+		
+		
+		
+		if(ismobile, set(hotspot[%1].scale, 0.8););
+		
+		set(tinf, "");
+		txtadd(tinf, "infoto_", %1);
+		set(hotspot[%1].foto, get(tinf));
+		addplugin(get(tinf));
+		plugin[get(tinf)].loadstyle(s_foto);
+		set(plugin[get(tinf)].url, %2);
+		set(plugin[get(tinf)].x, 0);
+		set(plugin[get(tinf)].y, 0);
+		
+		txtadd(tf2, "fototext_", %1);
+		set(hotspot[%1].fototext, get(tf2));
+		addplugin(get(tf2));
+		plugin[get(tf2)].loadstyle(style_fototext);
+		
+		set(f_text, "");
+		if(%3==null, set(plugin[get(tf2)].nulltext, true), txtadd(f_text, <p  align="left">, %3, </p>); );
+		
+		set(plugin[get(tf2)].css, "data:text_css"); 
+		set(plugin[get(tf2)].html, get(f_text));
+		
+		set(plugin[get(tf2)].x, 0);
+		set(plugin[get(tf2)].y, 0); 
+	</action>
+	
+	
+	
+    <textstyle name="buttonstyle" font="Arial" fontsize="12" bold="false" border="false" background="false" textcolor="0x000000" effect="glow(0xffffff,0.7,4,2);dropshadow(1,45,0xffffff,3,0.5);" />
+	<plugin name="introimage" devices="desktop" align="center" keep="true"  alpha="0" zorder="21" handcursor="true"  onclick="intro_off()" />
+	<plugin name="introimage_mobile"  align="center" keep="true" alpha="0" zorder="21" onclick="intro_off()"/>
+
+	
+	<action name="start_help">
+		delayedcall(1.2, "intro_on");
+	</action>
+	
+	<action name="intro_on">
+		set(plugin[introimage].x, 0);
+				
+		set(plugin[introimage].visible, true);
+		set(plugin[bn_closeintro].visible, true);
+		set(flag_intro_on, true);
+		set(flag_intro_autoclose, true);
+		ifnot(istouchdevice, tween(plugin[introimage].alpha,1, 0.5);
+							 set(plugin[introimage].url, "%BASEDIR%/modul/images/i_back1.png");
+							 tween(plugin[bn_closeintro].alpha,1, 0.5, default, delayedcall(15, autoclose()); set(plugin[bn_closeintro].enabled, true););
+							, 
+							set(plugin[introimage_mobile].enabled, true);
+							set(plugin[introimage_mobile].visible, true);
+							tween(plugin[introimage_mobile].alpha,1, 1, default, delayedcall(15, autoclose-m()));
+							
+		);
+	</action>
+	
+	<action name="intro_off">
+		set(plugin[introimage].enabled,false);
+		set(plugin[bn_closeintro].enabled,false);
+		set(flag_intro_on, false);
+		set(flag_intro_autoclose, false);
+		tween(plugin[introimage].alpha, 0, 0.5, default, set(plugin[introimage].visible, false); set(plugin[introimage].x, -1500););
+		tween(plugin[introimage_mobile].alpha, 0, 0.5, default, set(plugin[introimage_mobile].visible, false); set(plugin[introimage_mobile].x, -1500););
+	</action>
+	
+	<action name="autoclose">
+		if(flag_intro_on, 
+			if(flag_intro_autoclose,intro_off(););
+		);
+	</action>
+	
+	<action name="autoclose-m">
+		set(plugin[introimage_mobile].visible, false);
+		set(plugin[introimage_mobile].enabled, false);
+	</action>
+
+	
+	<textstyle name="buttonstyle" font="Arial" fontsize="12" bold="false" border="false" background="false" textcolor="0x000000" effect="glow(0xffffff,0.7,4,2);dropshadow(1,45,0xffffff,3,0.5);" alpha="0.8"/>
+	<style name="s_intro"  crop="152|0|38|38" onovercrop="152|38|38|38" ondowncrop="152|38|38|38" onhover="showtext(Помощь, text_hover);" onclick="intro_on();" alpha="0.8"/>
+	<style name="s_fs_open"  crop="38|0|38|38" onovercrop="38|38|38|38" ondowncrop="38|38|38|38" onhover="showtext(Полноэкранный режим, text_hover);" onclick="set(fullscreen,true);" alpha="0.8"/>
+	<style name="s_fs_close" crop="0|0|38|38" onovercrop="0|38|38|38" ondowncrop="0|38|38|38" onhover="showtext(Оконный режим, text_hover);" onclick="set(fullscreen,false);" alpha="0.8"/>
+	<style name="s_music_on"	crop="76|0|38|38" onovercrop="76|38|38|38" ondowncrop="76|38|38|38" onhover="showtext(Музыка включена, text_hover);" onclick="plugin[bn_music].loadstyle(s_music_off);  set(plugin[soundinterface].mute, true);" alpha="0.8"/>
+	<style name="s_music_off" 	crop="114|0|38|38" onovercrop="114|38|38|38" ondowncrop="114|38|38|38" onhover="showtext(Музыка выключена, text_hover);" onclick="plugin[bn_music].loadstyle(s_music_on); set(plugin[soundinterface].mute,false);" alpha="0.8"/>
+	<style name="s_rotate_on" 	crop="190|0|38|38" onovercrop="190|38|38|38" ondowncrop="190|38|38|38" onhover="showtext(Автовращение включено, text_hover);" onclick="plugin[bn_rotate].loadstyle(s_rotate_off); set(autorotate.enabled,false); set(const_autorotate, false); set(tek_rotate, false); is_close();" alpha="0.8"/>
+	<style name="s_rotate_off" 	crop="228|0|38|38" onovercrop="228|38|38|38" ondowncrop="228|38|38|38" onhover="showtext(Автовращение выключено, text_hover);" onclick="plugin[bn_rotate].loadstyle(s_rotate_on); set(autorotate.enabled,true); set(const_autorotate, true); set(tek_rotate, true); is_close();" alpha="0.8"/>
+	<style name="s_minus" 	crop="304|0|38|38" onovercrop="304|38|38|38" ondowncrop="304|38|38|38"  onhover="showtext(Отдалить, text_hover);" ondown="set(fov_moveforce,+1);"  onup="set(fov_moveforce,0);"  alpha="0.8"/>
+	<style name="s_plus" 	crop="266|0|38|38" onovercrop="266|38|38|38" ondowncrop="266|38|38|38"  onhover="showtext(Приблизить, text_hover);" ondown="set(fov_moveforce, -1);"  onup="set(fov_moveforce,0);" alpha="0.8" />
+	<events name="control" keep="true"  onenterfullscreen="plugin[bn_fs].loadstyle(s_fs_close);" onexitfullscreen="plugin[bn_fs].loadstyle(s_fs_open)"  />
+	<plugin name="gyro" url="%BASEDIR%/modul/plugins/gyro.js" preload="true" enabled="false" camroll="true" friction="0.5" velastic="0.2" devices="html5" keep="true" alpha="0.8"/>
+	<plugin name="bn_intro" visible="false" style="s_intro" keep="true" align="bottomright" y="10" x="10" url="%BASEDIR%/modul/images/buttons-control.png" alpha="0.8"/>
+	<plugin name="bn_fs" visible="false" style="s_fs_open" keep="true" align="bottomright" y="10" x="50" url="%BASEDIR%/modul/images/buttons-control.png" alpha="0.8"/>
+	<plugin name="bn_music" visible="false" style="s_music_on" keep="true" align="bottomright" y="10" x="210" url="%BASEDIR%/modul/images/buttons-control.png" alpha="0.8"/>
+	<plugin name="bn_rotate" visible="false" style="s_rotate_on" keep="true" align="bottomright" y="10" x="130" url="%BASEDIR%/modul/images/buttons-control.png" alpha="0.8"/>
+	<plugin name="bn_minus" visible="false" style="s_minus" keep="true" align="bottomright" y="10" x="170" url="%BASEDIR%/modul/images/buttons-control.png" alpha="0.8"/>
+	<plugin name="bn_plus" visible="false" style="s_plus" keep="true" align="bottomright" y="10" x="210" url="%BASEDIR%/modul/images/buttons-control.png" alpha="0.8"/>
+	<style name="s_fs_open_m"  crop="80|0|80|80" ondowncrop="80|80|80|80" onclick="set(fullscreen,true); plugin[bn_fs_m].loadstyle(s_fs_close_m);" alpha="0.8"/>
+	<style name="s_fs_close_m" crop="0|0|80|80"  ondowncrop="0|80|80|80" onclick="set(fullscreen,false); plugin[bn_fs_m].loadstyle(s_fs_open_m);" alpha="0.8"/>
+	<style name="s_music_on_m"	crop="160|0|80|80"  ondowncrop="160|80|80|80" onclick="plugin[bn_music_m].loadstyle(s_music_off_m);  set(plugin[soundinterface].mute, true);" alpha="0.8"/>
+	<style name="s_music_off_m" 	crop="240|0|80|80"  ondowncrop="240|80|80|80" onclick="plugin[bn_music_m].loadstyle(s_music_on_m); playsound(music1, get(music_url), 0); set(plugin[soundinterface].mute,false);" alpha="0.8"/>
+	<style name="s_rotate_on_m" 	crop="400|0|80|80" ondowncrop="400|80|80|80"  onclick="plugin[bn_rotate_m].loadstyle(s_rotate_off_m); set(autorotate.enabled,false); set(const_autorotate, false); set(tek_rotate,false); is_close();" alpha="0.8"/>
+	<style name="s_rotate_off_m" 	crop="480|0|80|80" ondowncrop="480|80|80|80" onclick="plugin[bn_rotate_m].loadstyle(s_rotate_on_m); set(autorotate.enabled,true); set(const_autorotate, true); set(tek_rotate, true); is_close();" alpha="0.8"/>
+	<style name="s_minus_m" 	crop="640|0|80|80" ondowncrop="640|80|80|80"  ondown="set(fov_moveforce,+1);"  onup="set(fov_moveforce,0);"  alpha="0.8"/>
+	<style name="s_plus_m" 	crop="560|0|80|80" ondowncrop="560|80|80|80"   ondown="set(fov_moveforce, -1);"  onup="set(fov_moveforce,0);"  alpha="0.8"/>
+	<style name="gr_on_m"	crop="720|0|80|80" ondowncrop="720|80|80|80"	 onclick="set_gr()" alpha="0.8"/>
+	<style name="gr_off_m"  crop="800|0|80|80" ondowncrop="800|80|80|80"	 onclick="set_gr()" alpha="0.8" />
+	<plugin name="bn_fs_m" visible="false" style="s_fs_open_m" keep="true" align="bottomright" y="10" x="10" url="%BASEDIR%/modul/images/buttons-control-m.png"/>
+	<plugin name="bn_music_m" visible="false" style="s_music_off_m" keep="true" align="bottomright" y="10" x="550" url="%BASEDIR%/modul/images/buttons-control-m.png"/>
+	<plugin name="bn_rotate_m" visible="false" style="s_rotate_on_m" keep="true" align="bottomright" y="10" x="190" url="%BASEDIR%/modul/images/buttons-control-m.png"/>
+	<plugin name="bn_minus_m" visible="false" style="s_minus_m" keep="true" align="bottomright" y="10" x="280" url="%BASEDIR%/modul/images/buttons-control-m.png"/>
+	<plugin name="bn_plus_m" visible="false" style="s_plus_m" keep="true" align="bottomright" y="10" x="370" url="%BASEDIR%/modul/images/buttons-control-m.png"/>
+	<plugin name="bn_gyro_m" visible="false" style="gr_off_m" keep="true" align="bottomright" y="10" x="460" url="%BASEDIR%/modul/images/buttons-control-m.png"/>
+		
+	<action name="set_gr">
+			if(plugin[gyro].enabled, 
+					set(plugin[gyro].enabled,false); plugin[bn_gyro_m].loadstyle(gr_off_m);
+					tween(view.camroll, 0, 1);
+					tween(view.vlookat, 0, 0.5);
+					,
+					set(plugin[gyro].enabled,true); plugin[bn_gyro_m].loadstyle(gr_on_m);
+			);
+	</action>	
+	
+	<action name="set_music">
+		if(plugin[soundinterface].enabled, set(plugin[soundinterface].mute,true););
+		set(music_url, %1);
+	</action>
+	
+	<action name="start_buttons">
+		set(const_autorotate, get(autorotate.enabled));
+		set(tek_rotate, get(autorotate.enabled));
+		if(music_url!==null,
+			if(isdesktop,
+				if (isflash, 
+					set(plugin[bn_intro].visible, true);
+					set(plugin[bn_fs].visible, true);
+					set(plugin[bn_rotate].visible, true);
+					set(plugin[bn_minus].visible, true);
+					set(plugin[bn_plus].visible, true);
+					,
+					set(plugin[bn_fs_m].x, 10);
+					set(plugin[bn_fs_m].visible, true);
+					set(plugin[bn_music_m].x, 100);
+					set(plugin[bn_rotate_m].x, 190);
+					set(plugin[bn_gyro_m].x, 280);
+					set(plugin[bn_music_m].visible, true);
+					set(plugin[bn_rotate_m].visible, true);
+					set(plugin[bn_gyro_m].visible, true);
+					
+				);
+				, 
+				if(isflash, 
+					set(plugin[bn_fs_m].visible, true);
+					set(plugin[bn_music_m].visible, true);
+					set(plugin[bn_rotate_m].visible, true);
+					set(plugin[bn_minus_m].visible, true);
+					set(plugin[bn_plus_m].visible, true);
+					, 
+					set(plugin[bn_fs_m].x, 10);
+					set(plugin[bn_fs_m].visible, true);
+					set(plugin[bn_music_m].x, 100);
+					set(plugin[bn_rotate_m].x, 190);
+					set(plugin[bn_gyro_m].x, 280);
+					set(plugin[bn_music_m].visible, true);
+					set(plugin[bn_rotate_m].visible, true);
+					set(plugin[bn_gyro_m].visible, true);
+					if(ispad, 	set(plugin[bn_fs_m].scale, 0.7);
+								set(plugin[bn_music_m].scale, 0.7);
+								set(plugin[bn_rotate_m].scale, 0.7);
+								set(plugin[bn_gyro_m].scale, 0.7);
+								set(plugin[bn_fs_m].x, 10);
+								set(plugin[bn_music_m].x, 70);
+								set(plugin[bn_rotate_m].x, 130);
+								set(plugin[bn_gyro_m].x, 190);
+					);
+				);
+			);
+			, 
+			if(isdesktop, 
+				if(isflash,
+					set(plugin[bn_rotate].x, 90);
+					set(plugin[bn_minus].x, 130);
+					set(plugin[bn_plus].x, 170);
+					set(plugin[bn_intro].visible, true);
+					set(plugin[bn_fs].visible, true);
+					set(plugin[bn_rotate].visible, true);
+					set(plugin[bn_minus].visible, true);
+					set(plugin[bn_plus].visible, true);
+					,
+					set(plugin[bn_rotate_m].x, 10);
+					set(plugin[bn_gyro_m].x, 100);
+					set(plugin[bn_rotate_m].visible, true);
+					set(plugin[bn_gyro_m].visible, true);
+				);
+				,
+				if(isflash, 
+					set(plugin[bn_fs_m].visible, true);
+					set(plugin[bn_rotate_m].x, 100);
+					set(plugin[bn_minus_m].x, 190);
+					set(plugin[bn_plus_m].x, 280);
+					set(plugin[bn_rotate_m].visible, true);
+					set(plugin[bn_minus_m].visible, true);
+					set(plugin[bn_plus_m].visible, true);
+					, 
+					set(plugin[bn_fs_m].x, 10);
+					set(plugin[bn_fs_m].visible, true);
+					set(plugin[bn_rotate_m].x, 100);
+					set(plugin[bn_gyro_m].x, 190);
+					set(plugin[bn_rotate_m].visible, true);
+					set(plugin[bn_gyro_m].visible, true);
+					if(ispad, 	set(plugin[bn_fs_m].scale, 0.7);
+								set(plugin[bn_rotate_m].scale, 0.7);
+								set(plugin[bn_gyro_m].scale, 0.7);
+								set(plugin[bn_fs_m].x, 10);
+								set(plugin[bn_rotate_m].x, 70);
+								set(plugin[bn_gyro_m].x, 130);
+					
+								
+					);
+					
+				);
+			)
+			
+		);
+		if(plugin[in].visible, set(plugin[in].visible, false));
+		if(plugin[out].visible, set(plugin[out].visible, false));
+		if(plugin[left].visible, set(plugin[left].visible, false));
+		if(plugin[right].visible, set(plugin[right].visible, false));
+		if(plugin[up].visible, set(plugin[up].visible, false));
+		if(plugin[down].visible, set(plugin[down].visible, false));
+		if(plugin[home].visible, set(plugin[home].visible, false));
+		if(plugin[openfs].visible, set(plugin[openfs].visible, false); set(plugin[openfs].alpha, 0); set(plugin[openfs].enabled, false); set(plugin[closefs].visible, false); set(plugin[closefs].alpha, 0);set(plugin[closefs].enabled, false););
+		if(plugin[closefs].visible, set(plugin[openfs].visible, false); set(plugin[openfs].alpha, 0); set(plugin[openfs].enabled, false); set(plugin[closefs].visible, false); set(plugin[closefs].alpha, 0);set(plugin[closefs].enabled, false););
+		if(plugin[soundON].visible, set(plugin[soundON].visible, false); set(plugin[soundON].alpha, 0); set(plugin[soundON].enabled, false); set(plugin[soundOFF].visible, false); set(plugin[soundOFF].alpha, 0); set(plugin[soundOFF].enabled, false););
+		if(plugin[soundOFF].visible, set(plugin[soundON].visible, false); set(plugin[soundON].alpha, 0); set(plugin[soundON].enabled, false); set(plugin[soundOFF].visible, false); set(plugin[soundOFF].alpha, 0); set(plugin[soundOFF].enabled, false););
+		if(plugin[autorotationON].visible, set(plugin[autorotationON].visible, false); set(plugin[autorotationON].alpha, 0); set(plugin[autorotationON].enabled, false); set(plugin[autorotationOFF].visible, false); set(plugin[autorotationOFF].alpha, 0); set(plugin[autorotationOFF].enabled, false););
+		if(plugin[autorotationOFF].visible, set(plugin[autorotationON].visible, false); set(plugin[autorotationON].alpha, 0); set(plugin[autorotationON].enabled, false); set(plugin[autorotationOFF].visible, false); set(plugin[autorotationOFF].alpha, 0); set(plugin[autorotationOFF].enabled, false););
+		if(plugin[info].visible, set(plugin[info].visible, false); set(plugin[helpScreen].visible, false);set(plugin[helpScreen].enabled, false););
+		
+		
+	</action>
+	
+    <style name="style_videotext"  keep="true" url="%BASEDIR%/modul/plugins/textfield.swf" align="center" textglow="3" width="480" textglowcolor="0x000000" x="0" y="0" 
+			autoheight="true" background="false" alpha="1"	 zorder="60"  visible="false"  enabled="false" selectable="false" edge="top" 
+			html=""	css="data:text_css" 
+			/>
+	<data name="text_css"> p{color:#FFFFFF; font-family:sans-serif; font-size:13; margin-left:1; margin-right:1; text-align:left; font-weight: normal;} </data>
+	<style name="s_videospot" keep="false" edge="bottom"  scale="0.5" crop="" alpha="1" url="%BASEDIR%/modul/images/videospot.png"  onover="vhs_over()"  onout="vhs_out()" onhover="vhs_hover()" handcursor="true"/>
+	
+	<plugin name="back_video" align="center"  edge="center" keep="true" alpha="0.8" url="%BASEDIR%/modul/images/back_black.png" visible="false" zorder="45" enabled="true" />	     
+	<plugin name="loadvideo" align="center"  edge="center" keep="true" alpha="1" url="%BASEDIR%/modul/images/loadvideo.png" visible="false" zorder="55" enabled="true" />	     
+	<style name="s_pl_video"
+        url="%BASEDIR%/modul/plugins/videoplayer.swf"
+        alturl="%BASEDIR%/modul/plugins/videoplayer.js"
+		align="center" x="0" y="0"
+        pausedonstart="true"
+        loop="true"
+		keep="true"
+        volume="1.0"
+		visible="false"
+        buffertime="0.1"
+        ignoremetadata="false"
+        updateeveryframe="true"
+        onvideoready="set(videoflag, true);"
+		videoflag="false"
+        onvideopaused=""
+        onvideocomplete=""
+        onunsupported=""
+		onclick="togglepause();  
+				set(plugin[soundinterface].mute,true);"
+		zorder="50"
+    />
+
+	<style name="s_hs_video" 
+			 url="%SWFPATH%/modul/plugins/videoplayer.swf" 
+			 alturl="%SWFPATH%/modul/plugins/videoplayer.js" 
+			 distorted="true"
+			 edge="center"
+			 rx="0"
+			 ry="0"
+			 rz="0"
+			 loop="true"
+			 onloaded="set(state_pause, true)"
+			 pausedonstart="true"
+			 directionalsound="true"
+			 range="200"
+			 volume="0.7"
+			 onclick="togglepause(); if(state_pause, set(plugin[soundinterface].mute, true);
+													set(state_pause, false);
+													, if(mz_state, set(plugin[soundinterface].mute, false);
+																, set(plugin[soundinterface].mute, true); );
+													set(state_pause, true);
+			);"
+			 keep="false"
+			 visible="true"
+	/>	
+	
+	<action name="close_video">
+		set(plugin[%1].visible, false);
+		plugin[%1].stop();
+		set(events.onmousedown, "");
+		set(plugin[back_video].visible, false);
+		set(plugin[%2].visible, false);
+		set(videospot_close, true);
+		vhs_out();
+		if(mz_state, set(plugin[soundinterface].mute, false);
+				, set(plugin[soundinterface].mute, true); );
+		set(plugin[loadvideo].visible, false);
+	</action>
+	
+	<action name="visible_video">
+		if(tek_videopleer!==null, set(plugin[get(tek_videopleer)].visible, false); set(plugin[get(tek_videopleer_text)].visible, false); );
+		set(tek_videopleer, %1);
+		set(tek_videopleer_text, %2);
+		
+		if(fotospot_close==false, close_fs_win());
+		
+		set(plugin[%1].visible, true);
+			
+		div(ttd2, get(plugin[%1].height), 2);
+		add(ttd2, 3);
+		set(plugin[%2].y, get(ttd2));
+				
+		set(plugin[%2].visible, true);
+		
+		vhs_over();
+	</action>
+			 
+	<action name="start_video">
+		set(events.onmousedown, "close_video(%1, %2);");
+		set(videospot_close, false);
+		if(plugin[%1].videoflag,
+			set(plugin[loadvideo].visible, false);
+			set(plugin[%1].videoflag, plugin[back_video].width, 30);
+			set(plugin[back_video].height, 30);
+			set(plugin[back_video].visible, true);
+			add(tvwidth, plugin[%1].width, 20);
+			add(tvheight, plugin[%1].height, 20);
+			add(tvheight, plugin[%2].height);
+			
+			div(plugin[back_video].y, get(plugin[%2].height), 2);
+			
+			set(plugin[%2].width, get(plugin[%1].width));
+			
+			
+			tween(plugin[back_video].width, get(tvwidth), 0.1);
+			tween(plugin[back_video].height, get(tvheight), 0.1, default,
+				visible_video(%1, %2);
+			);
+			,
+			set(plugin[loadvideo].visible, true);
+			delayedcall(0.5,
+				ifnot(videospot_close, start_video(%1, %2));
+			);
+		);
+	</action>
+	
+	<action name="vhs_over">
+		set(autorotate.enabled, false);
+	</action>
+	
+	<action name="vhs_hover">
+		showtext(get(overtext), text_hover);
+	</action>
+	
+	<action name="vhs_out">
+		if(videospot_close, 
+				if(info_close, 
+					set(autorotate.enabled, get(tek_rotate)););
+		);
+	</action>
+
+			 
+	<action name="set_videospot">
+		set(hotspot[%1].onloaded, "");
+		set(hotspot[%1].frame, 0);
+		set(hotspot[%1].lastframe, 0);
+		set(stopSequence,true);
+		
+		set(videospot_close, true);
+		set(hotspot[%1].video_url, %2);
+		set(hotspot[%1].video_poster, %3);
+		set(hotspot[%1].overtext, %4);
+		hotspot[%1].loadstyle(s_videospot);
+		if(ismobile, set(hotspot[%1].scale, 0.8););
+		set(tvideo, "");
+		txtadd(tvideo, "video_pleer_", %1);
+		addplugin(get(tvideo));
+		plugin[get(tvideo)].loadstyle(s_pl_video);
+		txtadd(temp_v_url, "%BASEDIR%/video/", %2);
+		txtadd(temp_v_posterurl, "%BASEDIR%/video/", %3);
+		set(plugin[get(tvideo)].videourl, get(temp_v_url));
+		set(plugin[get(tvideo)].posterurl, get(temp_v_posterurl));
+		set(hotspot[%1].video_pleer, get(tvideo));
+		set(hotspot[%1].onclick, start_video(get(video_pleer), get(text)));
+		
+		txtadd(tv3, "videotext_", %1);
+		set(hotspot[%1].videotext, get(tv3));
+		addplugin(get(tv3));
+		plugin[get(tv3)].loadstyle(style_videotext);
+		set(v_text, "");
+		txtadd(v_text, <p  align="left">, %4, </p>); 
+		set(plugin[get(tv3)].css, "data:text_css"); 
+		set(plugin[get(tv3)].html, get(v_text));
+		set(plugin[get(tv3)].x, 0);
+		set(plugin[get(tv3)].y, 0); 
+		set(hotspot[%1].text, get(tv3));
+	</action>
+	
+	<action name="set_videohotspot">
+		if(count_videohotspot===null, set(count_videohotspot, 0), inc(count_videohotspot));
+		set(tvih, "");
+		txtadd(tvih, "videohotspot", get(count_videohotspot));
+		addhotspot(get(tvih));
+		hotspot[get(tvih)].loadstyle(s_hs_video);
+		
+		set(hotspot[get(tvih)].ath, %1);
+		set(hotspot[get(tvih)].atv, %2);
+		txtadd(temp_v_hs_url, "%BASEDIR%/video/", %3);
+		txtadd(temp_v_hs_posterurl, "%BASEDIR%/video/", %4);
+		set(hotspot[get(tvih)].videourl, get(temp_v_hs_url));
+		set(hotspot[get(tvih)].posterurl, get(temp_v_hs_posterurl));
+		
+		set(hotspot[get(tvih)].scale, %5);
+	</action>
+
+</krpano>

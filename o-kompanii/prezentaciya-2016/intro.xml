@@ -1,0 +1,334 @@
+<krpano>
+
+	<plugin name="bn_menu_panotur" keep="true" visible="false" align="leftbottom" alpha="0.8" crop="0|0|120|37" onovercrop="0|37|120|37" zorder="20" url="1data/graphics/dop/bn_menu_panotur.png" x="11" y="11" 
+				onclick="come_back_intro();"
+	/>
+	
+
+	<action name="come_back_intro">
+		set(tek_autorot, get(autorotate.enabled));
+		set(autorotate.enabled, false);
+		
+		set(plugin[menu_back].visible, true);
+		
+		set(plugin[bn_foto].y, 55);
+		set(plugin[bn_video].y, 105);
+		set(plugin[bn_onas].y, 155);
+	
+		
+		set(hide_time, 0.3);
+		tween(plugin[menu_back].width, 485, 0.5);
+		tween(plugin[menu_back].height, 300, 0.5, default,
+			set(plugin[menu_logo].visible, true);
+			tween(plugin[menu_logo].alpha, 1, get(hide_time));
+			set(plugin[menu_logo_line].visible, true);
+			tween(plugin[menu_logo_line].alpha, 1, get(hide_time));
+			set(plugin[menu_logo_text].visible, true);
+			tween(plugin[menu_logo_text].alpha, 1, get(hide_time));
+			set(plugin[bn_close_menu].visible, true);
+			tween(plugin[bn_close_menu].alpha, 1, get(hide_time));
+			set(plugin[bn_foto].visible, true);
+			tween(plugin[bn_foto].alpha, 1, get(hide_time));
+			set(plugin[bn_video].visible, true);
+			tween(plugin[bn_video].alpha, 1, get(hide_time));
+			set(plugin[bn_onas].visible, true);
+			tween(plugin[bn_onas].alpha, 1, get(hide_time));
+<!-- 			set(plugin[bn_sert].visible, true);
+			tween(plugin[bn_sert].alpha, 1, get(hide_time)); -->
+		);
+		set(plugin[bn_menu_panotur].visible, false);
+	</action>	
+	
+	<action name="come_back_panotur">
+		set(autorotate.enabled, get(tek_autorot));
+
+		set(hide_time, 0.3);
+		tween(plugin[menu_logo].alpha, 0, get(hide_time), default, set(plugin[menu_logo].visible, false));
+		tween(plugin[menu_logo_line].alpha, 0, get(hide_time), default, set(plugin[menu_logo_line].visible, false));
+		tween(plugin[menu_logo_text].alpha, 0, get(hide_time), default, set(plugin[menu_logo_text].visible, false));
+		tween(plugin[bn_tur].alpha, 0, get(hide_time), default, set(plugin[bn_tur].visible, false));
+		tween(plugin[bn_foto].alpha, 0, get(hide_time), default, set(plugin[bn_foto].visible, false));
+		tween(plugin[bn_video].alpha, 0, get(hide_time), default, set(plugin[bn_video].visible, false));
+		tween(plugin[bn_onas].alpha, 0, get(hide_time), default, set(plugin[bn_onas].visible, false));
+		tween(plugin[bn_close_menu].alpha, 0, get(hide_time), default, set(plugin[bn_close_menu].visible, false););
+		tween(plugin[bn_sert].alpha, 0, get(hide_time), default, set(plugin[bn_sert].visible, false),
+			tween(plugin[menu_back].width, 14, 0.5);
+			tween(plugin[menu_back].height, 10, 0.5, default,
+				set(plugin[menu_back].visible, false);
+			);
+		);
+		set(plugin[bn_menu_panotur].visible, true);
+	</action>	
+	
+	
+	
+	<action name="start_panotur">
+		set(hide_time, 0.3);
+		tween(plugin[menu_logo].alpha, 0, get(hide_time), default, set(plugin[menu_logo].visible, false));
+		tween(plugin[menu_logo_line].alpha, 0, get(hide_time), default, set(plugin[menu_logo_line].visible, false));
+		tween(plugin[menu_logo_text].alpha, 0, get(hide_time), default, set(plugin[menu_logo_text].visible, false));
+		tween(plugin[bn_tur].alpha, 0, get(hide_time), default, set(plugin[bn_tur].visible, false));
+		tween(plugin[bn_foto].alpha, 0, get(hide_time), default, set(plugin[bn_foto].visible, false));
+		tween(plugin[bn_video].alpha, 0, get(hide_time), default, set(plugin[bn_video].visible, false));
+		tween(plugin[bn_onas].alpha, 0, get(hide_time), default, set(plugin[bn_onas].visible, false));
+		tween(plugin[bn_sert].alpha, 0, get(hide_time), default, set(plugin[bn_sert].visible, false),
+			tween(plugin[menu_back].width, 14, 0.5);
+			tween(plugin[menu_back].height, 10, 0.5, default,
+				set(plugin[menu_back].visible, false);
+			);
+		);
+		set(v_panotur, true);
+		set(plugin[bn_menu_panotur].visible, true);
+		loadscene(tur);
+		
+		
+	</action>	
+	
+	
+	<plugin name="menu0" visible="true" align="center" edge="center" zorder="1"  keep="false" url="1data/graphics/dop/fon0.jpg" handcursor="false" alpha="1" x="0" y="0" scalechildren="true" onloaded="delayedcall(0.2, start_intro())"/>	
+		<plugin name="menu_back" align="center" zorder="2" type="container" bgcolor="0xFFFFFF" bgalpha="0.0" width="14" height="10" x="0" y="0" keep="true" visible="false" />
+			<plugin name="menu_logo" keep="true" align="left" x="5" y="3" alpha="0" zorder="3" url="1data/graphics/dop/menu_logo.png"  parent="menu_back" onclick="openurl(http://viva-kitchen.com/, blank);"/>
+			
+
+		<plugin name="bn_tur" align="topleft" zorder="3" alpha="0" crop="0|0|210|44"  onclick="start_panotur();" onout="" onover="" onovercrop="0|44|210|44" url="1data/graphics/dop/bn_tur.png" x="235" y="70" parent="menu_back"/>
+		<plugin name="bn_foto" keep="true" align="topleft" zorder="3" alpha="0" crop="0|0|210|44"  onclick="hide_menu(open_fotog);" onout="" onover="" onovercrop="0|44|210|44" url="1data/graphics/dop/bn_foto.png" x="235" y="120" parent="menu_back"/>
+		<!-- <plugin name="bn_video" keep="true"  align="top" zorder="3" alpha="0" crop="0|0|270|32"  onclick="hide_menu(start_on_video);" onout="" onover="" onovercrop="0|32|270|32" url="1data/graphics/dop/bn_video.png" x="0" y="305" parent="menu_back"/> -->
+		<plugin name="bn_onas" keep="true"  align="topleft" zorder="3" alpha="0" crop="0|0|210|44" onclick="hide_menu(show_about);" onout="" onover="" onovercrop="0|44|210|44" url="1data/graphics/dop/bn_about0.png" x="235" y="170" parent="menu_back"/>
+<!-- 		<plugin name="bn_sert" keep="true"  align="top" zorder="3" alpha="0" crop="0|0|270|32" onclick="hide_menu(show_sert);" onout="" onover="" onovercrop="0|32|270|32" url="1data/graphics/dop/bn_sert.png" x="0" y="350" parent="menu_back"/> -->
+		
+		<plugin name="bn_close_menu" keep="true" align="topleft" zorder="3" alpha="0" visible="false" crop="0|0|210|44"  onclick="come_back_panotur();" onout="" onover="" onovercrop="0|44|210|44" url="1data/graphics/dop/bn_close_menu.png" x="235" y="205" parent="menu_back"/>
+		
+	<plugin name="menu_onas" keep="true"  align="center" zorder="3" onclick="" url="1data/graphics/dop/menu_onas.png" x="0" y="-33" visible="false" handcursor="false" />
+		<plugin name="bn_menu_back0" keep="true"  align="topright" edge="center"  crop="0|0|58|58" onovercrop="0|58|58|58" x="10%" y="10%" onclick="hide_about();" zorder="20" url="1data/graphics/dop/bn_fotogallery_close.png" parent="menu_onas"/>
+		<plugin name="bn_site1" keep="true"  align="bottom" crop="0|0|107|23" onovercrop="0|23|107|23" onclick="openurl(http://modern-teh.by/, blank);" zorder="20" url="1data/graphics/dop/bn_site.png" x="0" y="2.2%" parent="menu_onas"/>
+		
+		
+<!-- 	<plugin name="menu_sert" keep="true"  align="center" zorder="3" onclick="" url="1data/graphics/dop/menu_sert.png" x="0" y="0" visible="false" handcursor="false" zorder="10"/>
+		<plugin name="bn_menu_back1" keep="true"  align="bottom" crop="0|0|300|32" onovercrop="0|32|300|32" onclick="hide_sert();" zorder="20" url="1data/graphics/dop/bn_menu_back.png" x="0" y="6%" parent="menu_sert"/>
+ -->		
+	<events name="event_intro" keep="false"
+		onresize="resize_intro()"
+	/>
+	
+	<plugin name="pl_video" 
+			 url="%SWFPATH%/modul/plugins/videoplayer.swf" 
+			 alturl="%SWFPATH%/modul/plugins/videoplayer.js" 
+			 distorted="true"
+			 align="center"
+			 posterurl="%BASEDIR%/video/video1.jpg"
+			 pausedonstart="true"
+			 zorder="40"
+			volume="1"
+			 videourl="%BASEDIR%/video/video1.flv"
+			 onclick="togglepause(); if(state_pause, set(plugin[soundinterface].mute, true);
+													set(state_pause, false);
+													, if(mz_state, set(plugin[soundinterface].mute, false);
+																, set(plugin[soundinterface].mute, true); );
+													plugin[bn_music].loadstyle(s_music_off);
+													set(state_pause, true);
+			);"
+			 keep="true"
+			 visible="false"
+	/>	
+	<plugin name="menu_video" keep="true"  align="center" zorder="3" onclick="" url="1data/graphics/dop/menu_video.png" x="0" y="0" visible="false" handcursor="false" />
+		<plugin name="bn_video_close" align="topright" edge="center"  crop="0|0|58|58" onovercrop="0|58|58|58"  x="7%" y="7%" alpha="0.8"  zorder="50" keep="true" visible="false" url="1data/graphics/dop/bn_fotogallery_close.png" onclick="close_on_video();" parent="menu_video"/>
+	
+	<action name="close_on_video">
+		set(plugin[menu0].visible, true);
+		set(plugin[menu_video].visible, false);
+		set(plugin[pl_video].visible, false);
+		plugin[pl_video].stop();
+		set(plugin[bn_video_close].visible, false);
+		tween(plugin[menu_back].width, 14, 0.5);
+		tween(plugin[menu_back].height, 10, 0.5, default, show_menu(););
+	</action>	
+	
+	<action name="start_on_video">
+		tween(plugin[menu_back].width, 1200, 0.5);
+		tween(plugin[menu_back].height, 900, 0.5, default,
+			set(plugin[pl_video].visible, true);
+			set(plugin[bn_video_close].visible, true);
+			set(plugin[menu0].visible, false);
+			set(plugin[menu_video].visible, true);
+			set(state_pause, false);
+			plugin[pl_video].togglepause();
+		);
+	</action>	
+		
+	
+	<action name="show_menu">
+		set(hide_time, 0.3);
+		tween(plugin[menu_back].width, 485, 0.5);
+		tween(plugin[menu_back].height, 300, 0.5, default,
+			set(plugin[menu_logo].visible, true);
+			tween(plugin[menu_logo].alpha, 1, get(hide_time));
+			set(plugin[menu_logo_line].visible, true);
+			tween(plugin[menu_logo_line].alpha, 1, get(hide_time));
+			set(plugin[menu_logo_text].visible, true);
+			tween(plugin[menu_logo_text].alpha, 1, get(hide_time));
+			set(plugin[bn_foto].visible, true);
+			tween(plugin[bn_foto].alpha, 1, get(hide_time));
+			set(plugin[bn_video].visible, true);
+			tween(plugin[bn_video].alpha, 1, get(hide_time));
+			set(plugin[bn_onas].visible, true);
+			tween(plugin[bn_onas].alpha, 1, get(hide_time));
+			set(plugin[bn_sert].visible, true);
+			tween(plugin[bn_sert].alpha, 1, get(hide_time));
+			if(v_panotur, 
+					set(plugin[bn_close_menu].visible, true);
+					tween(plugin[bn_close_menu].alpha, 1, get(hide_time));
+					,
+					set(plugin[bn_tur].visible, true);
+					tween(plugin[bn_tur].alpha, 1, get(hide_time));
+			);
+		);
+	</action>
+	
+	<action name="hide_menu">
+		set(hide_time, 0.3);
+		tween(plugin[menu_logo].alpha, 0, get(hide_time), default, set(plugin[menu_logo].visible, false));
+		tween(plugin[menu_logo_line].alpha, 0, get(hide_time), default, set(plugin[menu_logo_line].visible, false));
+		tween(plugin[menu_logo_text].alpha, 0, get(hide_time), default, set(plugin[menu_logo_text].visible, false));
+		tween(plugin[bn_tur].alpha, 0, get(hide_time), default, set(plugin[bn_tur].visible, false));
+		tween(plugin[bn_foto].alpha, 0, get(hide_time), default, set(plugin[bn_foto].visible, false));
+		tween(plugin[bn_video].alpha, 0, get(hide_time), default, set(plugin[bn_video].visible, false));
+		tween(plugin[bn_onas].alpha, 0, get(hide_time), default, set(plugin[bn_onas].visible, false));
+		tween(plugin[bn_close_menu].alpha, 0, get(hide_time), default, set(plugin[bn_close_menu].visible, false););
+		
+		tween(plugin[bn_sert].alpha, 0, get(hide_time), default, set(plugin[bn_sert].visible, false),
+			tween(plugin[menu_back].width, 14, 0.5);
+			tween(plugin[menu_back].height, 10, 0.5, default,
+				delayedcall(0, %1);
+			);
+		);
+	
+	</action>
+	
+	<action name="open_fotog">
+		if(stageheight GE 812, 
+				set(mh, 812); set(mw, 1200);
+				,
+				div(mm, stageheight, 812); mul(mh, 812, mm); mul(mw, 1200, mm);
+		);
+		tween(plugin[menu_back].width, get(mw), 0.5);
+		tween(plugin[menu_back].height, get(mh), 0.5, default, 
+			set(plugin[menu_back].visible, true);
+			set(plugin[menu0].visible, false);
+			show_fotog(1);
+		);
+	</action>	
+	
+	<action name="show_sert">
+		if(stageheight GE 800, 
+				set(mh, 800); set(mw, 1190);
+				,
+				div(mm, stageheight, 810); mul(mh, 800, mm); mul(mw, 1190, mm);
+		);
+		tween(plugin[menu_back].width, get(mw), 0.5);
+		tween(plugin[menu_back].height, get(mh), 0.5, default, 
+			set(plugin[menu_sert].width, get(mw));
+			set(plugin[menu_sert].height, get(mh));
+			set(plugin[menu_sert].visible, true);
+		);
+	</action>	
+	
+	<action name="hide_sert">
+		set(plugin[menu_sert].visible, false);
+		tween(plugin[menu_back].width, 14, 0.5);
+		tween(plugin[menu_back].height, 10, 0.5, default, show_menu(););
+	</action>
+	
+	
+	<action name="show_about">
+		tween(plugin[menu_back].width, 1200, 1);
+		tween(plugin[menu_back].height, 800, 1, default,
+			set(plugin[menu0].visible, false);
+			set(plugin[menu_onas].visible, true);
+		);
+	</action>
+	
+	<action name="hide_about">
+		set(plugin[menu_onas].visible, false);
+		set(plugin[menu0].visible, true);
+		tween(plugin[menu_back].width, 14, 0.5);
+		tween(plugin[menu_back].height, 10, 0.5, default, show_menu(););
+	</action>
+	
+		
+	<action name="show_dop">
+		switch(plugin[pdop].visible);
+		tween(plugin[pdop].x, 0, 1);
+	</action>
+	
+	<action name="hide_dop">
+		tween(plugin[pdop].x, -2000, 1, default, 
+			switch(plugin[pdop].visible);
+		);
+	</action>
+	
+	<action name="resize_intro">
+		if(stagewidth LT 900, 
+			div(dd, stagewidth, 900);
+			set(plugin[menu0].scale, get(dd));
+		);
+		if(stageheight LT 690,
+			set(plugin[menu_onas].height, get(stageheight));
+			set(plugin[menu_onas].width, "prop");
+			set(plugin[menu_video].height, get(stageheight));
+			set(plugin[menu_video].width, "prop");
+			,
+			set(plugin[menu_onas].height, 690);
+			set(plugin[menu_onas].width, "prop");
+			set(plugin[menu_video].height, 690);
+			set(plugin[menu_video].width, "prop");
+		);
+	</action>
+	
+	<action name="start_intro">
+		set(v_panotur, false);
+		if(not_init_foto===null, 
+			set_all_gallery();
+			init_fotog(1);
+			set_lang_url_gal();
+		);
+		set(not_init_foto, false);
+		set(plugin[menu_back].visible, true);
+		tween(plugin[menu_back].bgalpha, 1, 1);
+		tween(plugin[menu_back].width, 485, 1);
+		tween(plugin[menu_back].height, 300, 1, default, 
+			tween(plugin[menu_logo].alpha, 1, 0.5, default, 
+					tween(plugin[menu_logo_text].alpha, 1, 0.5);
+					delayedcall(0.2, tween(plugin[bn_tur].alpha, 1, 0.2););
+					delayedcall(0.3, tween(plugin[bn_foto].alpha, 1, 0.2););
+					delayedcall(0.4, tween(plugin[bn_video].alpha, 1, 0.2););
+					delayedcall(0.5, tween(plugin[bn_onas].alpha, 1, 0.2););
+<!-- 					delayedcall(0.6, tween(plugin[bn_sert].alpha, 1, 0.2);); -->
+				);
+		);
+		
+		
+	</action>
+	
+	<action name="set_all_gallery">
+				set_fotog(1, 1.jpg);
+				set_fotog(1, 2.jpg);
+				set_fotog(1, 3.jpg);
+				set_fotog(1, 4.jpg);
+				set_fotog(1, 5.jpg);
+				set_fotog(1, 6.jpg);
+				set_fotog(1, 7.jpg);
+				set_fotog(1, 8.jpg);
+				set_fotog(1, 9.jpg);
+				set_fotog(1, 10.jpg);
+				set_fotog(1, 11.jpg);
+				set_fotog(1, 12.jpg);
+				set_fotog(1, 13.jpg);
+				set_fotog(1, 14.jpg);
+				set_fotog(1, 15.jpg);
+				set_fotog(1, 16.jpg);
+				set_fotog(1, 17.jpg);
+				
+				
+	</action>
+	
+</krpano>

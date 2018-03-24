@@ -1,0 +1,188 @@
+<krpano logkey="false" showerrors="false" onstart="loadscene(intro)" bgcolor="0xFFFFFF" >
+	
+	<scene name="intro" > 
+		<include url="intro.xml"/>
+		<include url="1data/graphics/dop/fotog.xml"/>
+		
+	</scene>
+
+	<scene name="tur" onstart="startall()"> 
+
+		<include url="modul/modul.xml"/>
+		
+		<action name="startall">
+				displayHelp();
+				start_modul();
+		</action>
+	
+					
+			<action name="mainloadpano">
+				closepanoobjects();
+				closeglobalobjects();
+				ifnot(stopSequence === undefined,interruptAnimation(););
+				loadpano(%1,NULL,NULL,BLEND(1));
+			</action>
+			<plugin name="firstpano" xml="11.xml"/> 
+			<!--************** KrPano plugins and datas ***************************************************-->
+			<plugin name="data" soundOn="true" keep="true"/>
+			<!--************** Open the first pano ********************************************************-->
+			<include url="modul/modul.xml"/> 
+			<autorotate enabled="false"/>
+	
+			<action name="playsoundaction">
+				set(plugin[data].soundOn, true);
+				playpanosounds(forcesounds);
+			</action>
+			<action name="stopsoundaction">
+				set(plugin[data].soundOn, false);
+				stoppanosounds();
+			</action>
+			<!--************** Fonts **********************************************************************-->
+			<textstyle name="DEFAULT" bold="false" font="Arial" fontsize="16" italic="false" textcolor="0xff000000"/>
+			<!--************** Pano list ******************************************************************-->
+			<plugin name="combobox" url="1data/graphics/combobox.swf" preload="true" alturl="1data/graphics/combobox.js" keep="true" align="righttop" x="10" y="10">
+        <item name="combobox0" caption="VivaKitchen" onClick="mainloadpano(10.xml);"/>
+        <item name="combobox1" caption="VivaKitchen" onClick="mainloadpano(11.xml);"/>
+        
+    </plugin>
+			<!--************** Thumbnail plugin ***********************************************************-->
+			<events name="thumbnailsResizeEvent" onresize="thumbsResizeEventHandler();"/>
+			<!-- action performed when mouse hovers over a thumbnail preview -->
+			<action name="magnify">
+				tween(plugin[%1].alpha,  1.0, 0.3, easeInQuad);
+				tween(plugin[%1].scale, 1.05, 0.3, easeInQuad);
+			</action>
+			<!-- action performed when mouse goes away from a thumbnail preview -->
+			<action name="lie">
+				tween(plugin[%1].alpha, 0.8, 0.3, easeInQuad);
+				tween(plugin[%1].scale, 1.0, 0.3, easeInQuad);
+			</action>
+			<!-- open the thumbnail -->
+			<action name="slide_action_in">
+				set(plugin[slide].onclick,slide_action_out);
+				set(plugin[strap].onclick,slide_action_out);
+				set(plugin[strapArrow].rotate,180);
+				tween(plugin[thumbArray].x, 10%, 1, easeOutQuint);
+				tween(plugin[thumbMovePrev].x, 5%,1, easeOutQuint);
+				tween(plugin[thumbMoveNext].x, 5%, 1, easeOutQuint);
+				thumbsResizeEventHandler();
+			</action>
+			<!-- close the thumbnail -->
+			<action name="slide_action_out">
+				set(plugin[slide].onclick,slide_action_in);
+				set(plugin[strap].onclick,slide_action_in);
+				set(plugin[strapArrow].rotate,0);
+				tween(plugin[thumbArray].x, 0, 1, easeOutQuint);
+				tween(plugin[thumbMovePrev].x, 0, 1, easeOutQuint);
+				tween(plugin[thumbMoveNext].x, 0, 1, easeOutQuint);
+				set(plugin[thumbMovePrev].visible,false);
+				set(plugin[thumbMoveNext].visible,false);
+			</action>
+			<action name="moveThumbsPrev">
+				plugin[thumbArray].updatepos();
+				copy(truethumbsheight, plugin[thumbArray].pixelheight);
+				if (area.pixelheight GT truethumbsheight,
+				set(plugin[thumbBgLayout].y, 0);,
+				set(leftborder, get(area.pixelheight));
+				sub(leftborder, truethumbsheight);
+				div(leftborder, 2);
+				mul(leftborder, -1);
+				if (plugin[thumbBgLayout].y LT leftborder, inc(plugin[thumbBgLayout].y, %1););
+				if (plugin[thumbBgLayout].y GT leftborder, set(plugin[thumbBgLayout].y, get(leftborder)););
+				);
+			</action>
+			<action name="moveThumbsNext">
+				plugin[thumbArray].updatepos();
+				copy(truethumbsheight, plugin[thumbArray].pixelheight);
+				if (area.pixelheight GT truethumbsheight,
+				set(plugin[thumbBgLayout].y, 0);,
+				set(rightborder, get(area.pixelheight));
+				sub(rightborder, truethumbsheight);
+				div(rightborder, 2);
+				if (plugin[thumbBgLayout].y GT rightborder, dec(plugin[thumbBgLayout].y, %1););
+				if (plugin[thumbBgLayout].y LT rightborder, set(plugin[thumbBgLayout].y, get(rightborder)););
+				);
+			</action>
+			<action name="thumbsResizeEventHandler">
+				plugin[thumbArray].updatepos();
+				copy(truethumbsheight, plugin[thumbArray].pixelheight);
+				if (area.pixelheight GT truethumbsheight,
+				set(plugin[thumbBgLayout].y, 0);displayThumbsScrolls(false);,
+				if (plugin[slide].onclick == slide_action_out, displayThumbsScrolls(true););
+				);
+			</action>
+			<action name="displayThumbsScrolls">
+				set(plugin[thumbMovePrev].visible, %1);
+				set(plugin[thumbMovePrev].enabled, %1);
+				set(plugin[thumbMoveNext].visible, %1);
+				set(plugin[thumbMoveNext].enabled, %1);
+			</action>
+			<action name="adjusthtml5thumbsplugins">
+				if (ishtml5 == true,
+				set(plugin[thumbMovePrev].height, 5%);
+				set(plugin[thumbMoveNext].height, 5%);
+				);
+			</action>
+			<plugin name="thumbArray" keep="true" zorder="1" url="1data/graphics/transparent.png" handcursor="false" capture="false" children="true" alpha="0.9" blendmode="normal" smoothing="true" x="10%" y="0" scale="1" align="left" edge="right" width="10%" height="prop"/>
+			<plugin name="thumbBgLayout" keep="true" zorder="1" url="1data/graphics/transparent.png" handcursor="false" capture="false" x="0" y="0" align="center" edge="center" width="100%" height="prop" parent="thumbArray"/>
+			<plugin name="thumbMovePrev" keep="true" zorder="3" capture="true" url="1data/graphics/thumb_scroll.png" alpha="0.8" onover="set(alpha, 1);" onout="set(alpha,0.8);set(scrollspeed,10);" scrollspeed="10" onhover="moveThumbsPrev(get(scrollspeed));if(scrollspeed LT 70, inc(scrollspeed););" onclick="moveThumbsPrev(50);" x="5%" y="10" align="topleft" edge="top"/>
+			<plugin name="thumbMoveNext" keep="true" zorder="3" capture="true" url="1data/graphics/thumb_scroll.png" alpha="0.8" onover="set(alpha, 1);" onout="set(alpha,0.8);set(scrollspeed,10);" scrollspeed="10" onhover="moveThumbsNext(get(scrollspeed));if(scrollspeed LT 70, inc(scrollspeed););" onclick="moveThumbsNext(50);" x="5%" y="10" align="bottomleft" edge="bottom"/>
+			<plugin name="thumbMovePrevArrow" parent="thumbMovePrev" keep="true" zorder="3" capture="false" url="1data/graphics/arrow.png" x="0" y="0" align="center" edge="center" rotate="-90"/>
+			<plugin name="thumbMoveNextArrow" parent="thumbMoveNext" keep="true" zorder="3" capture="false" url="1data/graphics/arrow.png" x="0" y="0" align="center" edge="center" rotate="90"/>
+			<plugin name="slide" parent="thumbArray" keep="true" zorder="0" url="1data/graphics/slide.png" handcursor="false" capture="false" children="true" alpha="0.9" blendmode="normal" smoothing="true" x="0" y="0" align="right" edge="right" width="100%" height="2000" onclick="slide_action_out"/>
+			<plugin name="strap" keep="true" zorder="0" url="1data/graphics/strap.png" parent="thumbArray" alpha="0.9" align="right" edge="left" handcursor="true" onclick="slide_action_out"/>
+			<plugin name="strapArrow" keep="true" parent="strap" zorder="0" url="1data/graphics/arrow.png" align="center" edge="center" capture="false" enabled="false" rotate="180"/>
+			<!-- thumbs pictures -->
+			<plugin name="thumb_10" keep="true" zorder="2" parent="thumbBgLayout" url="1data/graphics/10_thumbnail.jpg" width="83.3333%" height="prop" align="topleft" edge="center" x="50%" y="13.3333%" alpha="0.8" onclick="mainloadpano(10.xml);" onover="magnify('thumb_10'); " onhover="showtext(Кухни Делия);" onout="lie('thumb_10');" visible="false" onloaded="thumbloaded();"/>
+			<plugin name="thumb_11" keep="true" zorder="2" parent="thumbBgLayout" url="1data/graphics/11_thumbnail.jpg" width="83.3333%" height="prop" align="topleft" edge="center" x="50%" y="37.7778%" alpha="0.8" onclick="mainloadpano(11.xml);" onover="magnify('thumb_11'); " onhover="showtext(Кухни Делия);" onout="lie('thumb_11');" visible="false" onloaded="thumbloaded();"/>
+			<plugin name="thumb_12" keep="true" zorder="2" parent="thumbBgLayout" url="1data/graphics/12_thumbnail.jpg" width="83.3333%" height="prop" align="topleft" edge="center" x="50%" y="62.2222%" alpha="0.8" onclick="mainloadpano(12.xml);" onover="magnify('thumb_12'); " onhover="showtext(Кухни Делия);" onout="lie('thumb_12');" visible="false" onloaded="thumbloaded();"/>
+			<plugin name="thumb_13" keep="true" zorder="2" parent="thumbBgLayout" url="1data/graphics/13_thumbnail.jpg" width="83.3333%" height="prop" align="topleft" edge="center" x="50%" y="86.6667%" alpha="0.8" onclick="mainloadpano(13.xml);" onover="magnify('thumb_13'); " onhover="showtext(Кухни Делия;" onout="lie('thumb_13');" visible="false" onloaded="thumbloaded();"/>
+			<plugin name="thumb_14" keep="true" zorder="2" parent="thumbBgLayout" url="1data/graphics/14_thumbnail.jpg" width="83.3333%" height="prop" align="topleft" edge="center" x="50%" y="86.6667%" alpha="0.8" onclick="mainloadpano(14.xml);" onover="magnify('thumb_14'); " onhover="showtext(Кухни Делия;" onout="lie('thumb_14');" visible="false" onloaded="thumbloaded();"/>
+			<plugin name="thumbnailsData" keep="true" nbThumbnailsLoaded="0"/>
+			<action name="thumbloaded">
+				inc(plugin[thumbnailsData].nbThumbnailsLoaded, 1);
+				if(plugin[thumbnailsData].nbThumbnailsLoaded GE 4,
+				setThumbnailsVisible();
+				thumbsResizeEventHandler();
+				adjusthtml5thumbsplugins();
+				);
+			</action>
+			<action name="setThumbnailsVisible">
+				set(plugin[thumb_10].visible, true);
+				set(plugin[thumb_11].visible, true);
+				set(plugin[thumb_12].visible, true);
+				set(plugin[thumb_13].visible, true);
+			</action>
+			<!--************** Background sound ***********************************************************-->
+			<action name="playbackgroundsound">
+				if(%1 == none,
+					stopallsounds();
+					set(plugin[soundinterface].background,%1);
+					,
+					if(plugin[soundinterface].background == %1,
+						if (%3 == forcesounds,
+							stopallsounds();playsound(backgroundsound,%1,%2);
+						)
+						,
+						stopallsounds();playsound(backgroundsound,%1,%2);
+						set(plugin[soundinterface].background,%1);
+					)
+				);
+			</action>
+			<action name="stopbackgroundsound">
+				stopsound(backgroundsound);
+			</action>
+			<action name="closeglobalobjects">
+				slide_action_out();
+			</action>
+			<!-- Raise sequence stopper and wait sequence time to break the delayed calls -->
+			<action name="interruptAnimation">
+				ifnot (stopSequence === undefined,
+					set(stopSequence, true);
+					wait(0);
+				);
+			</action>
+			
+	</scene>	
+		
+</krpano>
